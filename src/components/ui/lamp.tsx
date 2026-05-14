@@ -273,7 +273,7 @@ export const LampContainer = ({
     >
       {/* Light effects */}
       <div
-        className="relative flex w-full scale-y-125 items-center justify-center isolate z-0 overflow-hidden"
+        className="relative flex w-full scale-y-125 items-center justify-center isolate z-0 [overflow:clip]"
         style={{ height: "clamp(180px, 30vw, 340px)" }}
       >
         {/* Left cone */}

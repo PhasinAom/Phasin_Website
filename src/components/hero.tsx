@@ -118,7 +118,7 @@ export const Hero = () => {
         {/* Sticky Navbar — fixed to viewport so it persists on scroll */}
         <nav className="fixed left-1/2 top-0 z-50 -translate-x-1/2">
           <div
-            className="flex items-center gap-3 rounded-b-2xl px-4 py-2 sm:gap-6 md:gap-12 md:rounded-b-3xl md:px-8 lg:gap-14 transition-all duration-500"
+            className="flex items-center gap-4 rounded-b-2xl px-5 py-2 sm:gap-6 md:gap-12 md:rounded-b-3xl md:px-8 lg:gap-14 transition-all duration-500"
             style={{
               backgroundColor: scrolled ? "rgba(0,0,0,0.85)" : "#000000",
               backdropFilter: scrolled ? "blur(12px)" : "none",
@@ -129,7 +129,7 @@ export const Hero = () => {
               <a
                 key={item.label}
                 href={item.href}
-                className="text-[10px] transition-colors sm:text-xs md:text-sm cursor-pointer"
+                className="text-sm transition-colors md:text-base cursor-pointer"
                 style={{ color: "rgba(225, 224, 204, 0.8)" }}
                 onMouseEnter={(e) => (e.currentTarget.style.color = "#E1E0CC")}
                 onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(225, 224, 204, 0.8)")}
@@ -151,7 +151,7 @@ export const Hero = () => {
         <div className="absolute bottom-0 left-0 right-0">
           {/* Heading — full width */}
           <h1
-            className="font-medium leading-[0.85] tracking-[-0.07em] text-[26vw] sm:text-[24vw] md:text-[22vw] lg:text-[20vw] xl:text-[19vw] 2xl:text-[20vw]"
+            className="font-medium leading-[0.85] tracking-[-0.07em] text-[20vw] sm:text-[22vw] md:text-[22vw] lg:text-[20vw] xl:text-[19vw] 2xl:text-[20vw]"
             style={{ color: "#E1E0CC" }}
           >
             <WordsPullUp text="Welcome" showAsterisk />

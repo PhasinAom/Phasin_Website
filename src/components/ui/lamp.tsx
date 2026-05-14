@@ -273,7 +273,7 @@ export const LampContainer = ({
     >
       {/* Light effects */}
       <div
-        className="relative flex w-full scale-y-125 items-center justify-center isolate z-0 [overflow:clip]"
+        className="relative flex w-full scale-y-125 items-center justify-center isolate z-0 overflow-hidden"
         style={{ height: "clamp(180px, 30vw, 340px)" }}
       >
         {/* Left cone */}
@@ -305,15 +305,15 @@ export const LampContainer = ({
 
         {/* Center glow */}
         <div
-          className="absolute inset-auto z-50 h-36 w-[clamp(10rem,60vw,28rem)] -translate-y-1/2 rounded-full opacity-50 blur-3xl transition-colors duration-500"
+          className="absolute inset-auto z-50 h-2 w-2 -translate-y-[5rem] rounded-full opacity-60 blur-3xl transition-colors duration-500"
           style={{ background: color }}
         />
         <motion.div
-          initial={{ width: "4rem" }}
-          whileInView={{ width: "clamp(6rem,20vw,16rem)" }}
+          initial={{ width: "2rem" }}
+          whileInView={{ width: "clamp(3rem,8vw,6rem)" }}
           transition={{ delay: 0.3, duration: 0.8, ease: "easeInOut" }}
           className="absolute inset-auto z-30 -translate-y-[6rem] rounded-full blur-2xl transition-colors duration-500"
-          style={{ background: color, height: "9rem" }}
+          style={{ background: color, height: "3rem" }}
         />
 
         {/* Horizontal line */}

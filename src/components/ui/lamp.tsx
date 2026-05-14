@@ -113,7 +113,7 @@ export function LampDemo() {
         initial={{ opacity: 0.5, y: 100 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3, duration: 0.8, ease: "easeInOut" }}
-        className="text-center text-4xl font-medium leading-tight tracking-[-0.04em] md:text-6xl"
+        className="text-center text-2xl font-medium leading-tight tracking-[-0.04em] sm:text-3xl md:text-5xl lg:text-6xl"
         style={{ color: "#E1E0CC" }}
       >
         Want your own website or system? <br /> Ask Phasin Bot
@@ -162,7 +162,7 @@ export function LampDemo() {
           />
 
         <div
-          className="flex items-center gap-3 rounded-2xl px-6 py-5 w-full transition-all duration-500"
+          className="flex items-center gap-3 rounded-2xl px-4 py-3 sm:px-6 sm:py-5 w-full transition-all duration-500"
           style={{
             background: "#0a0a0a",
           }}
@@ -172,7 +172,7 @@ export function LampDemo() {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter") { send(input); setInput(""); } }}
             placeholder="Ask anything..."
-            className="flex-1 bg-transparent text-base outline-none"
+            className="flex-1 bg-transparent text-sm sm:text-base outline-none"
             style={{ color: "rgba(225,224,204,0.85)" }}
           />
           <button

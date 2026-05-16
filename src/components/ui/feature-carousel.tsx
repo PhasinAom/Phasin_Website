@@ -1,221 +1,338 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useRef, useState, useEffect } from 'react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
 import {
   GlobalSearchIcon,
   AiCloudIcon,
   DashboardSquare01Icon,
   MagicWandIcon,
-} from "@hugeicons/core-free-icons";
-import { cn } from "@/lib/utils";
-import { HugeiconsIcon } from "@hugeicons/react";
+} from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const PRODUCTS = [
   {
-    id: "portfolio",
-    label: "Custom Websites",
+    id: 'portfolio',
+    label: 'Custom Websites',
     icon: GlobalSearchIcon,
-    image: "https://images.unsplash.com/photo-1547658719-da2b51169166?q=80&w=1200",
-    description: "Clean, fast custom websites crafted with modern design and attention to detail.",
+    image: 'https://images.unsplash.com/photo-1547658719-da2b51169166?q=80&w=1200',
+    description: 'Clean, fast custom websites crafted with modern design and attention to detail.',
   },
   {
-    id: "carrental",
-    label: "Car Rental System",
+    id: 'carrental',
+    label: 'Car Rental System',
     icon: DashboardSquare01Icon,
-    image: "https://images.unsplash.com/photo-1485291571150-772bcfc10da5?q=80&w=1200",
-    description: "End-to-end car rental platform handling 200+ cars with booking management and real-time availability.",
+    image: 'https://images.unsplash.com/photo-1485291571150-772bcfc10da5?q=80&w=1200',
+    description: 'End-to-end car rental platform — 200+ cars, booking management, real-time availability.',
   },
   {
-    id: "linecrm",
-    label: "Line Automation CRM",
+    id: 'linecrm',
+    label: 'Line Automation CRM',
     icon: AiCloudIcon,
-    image: "https://images.unsplash.com/photo-1611746872915-64382b5c76da?q=80&w=1200",
-    description: "Automated CRM built on LINE — managing leads, messages, and customer journeys at scale.",
+    image: 'https://images.unsplash.com/photo-1611746872915-64382b5c76da?q=80&w=1200',
+    description: 'Automated CRM built on LINE — managing leads, messages, and customer journeys at scale.',
   },
   {
-    id: "hotel",
-    label: "Hotel Website",
+    id: 'hotel',
+    label: 'Hotel Website',
     icon: MagicWandIcon,
-    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1200",
-    description: "A premium hotel website with room browsing, booking flow, and a polished guest experience.",
+    image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1200',
+    description: 'A premium hotel website with room browsing, booking flow, and a polished guest experience.',
     inProgress: true,
   },
 ];
 
-const AUTO_PLAY_INTERVAL = 3000;
-const ITEM_HEIGHT = 65;
+const N = PRODUCTS.length;
 
-const wrap = (min: number, max: number, v: number) => {
-  const rangeSize = max - min;
-  return ((((v - min) % rangeSize) + rangeSize) % rangeSize) + min;
-};
+// Ease helpers (no deps)
+function easeInOut(t: number) {
+  return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+}
+function clamp01(v: number) {
+  return Math.max(0, Math.min(1, v));
+}
+function remap(v: number, inMin: number, inMax: number) {
+  return clamp01((v - inMin) / (inMax - inMin));
+}
 
 export function FeatureCarousel() {
-  const [step, setStep] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const [activeIdx, setActiveIdx] = useState(0);
+  const [reducedMotion, setReducedMotion] = useState(false);
 
-  const currentIndex =
-    ((step % PRODUCTS.length) + PRODUCTS.length) % PRODUCTS.length;
-
-  const nextStep = useCallback(() => {
-    setStep((prev) => prev + 1);
-  }, []);
-
-  const handleChipClick = (index: number) => {
-    const diff = (index - currentIndex + PRODUCTS.length) % PRODUCTS.length;
-    if (diff > 0) setStep((s) => s + diff);
-  };
+  const imgRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const contentRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const progressRef = useRef<HTMLDivElement>(null);
+  const counterRef = useRef<HTMLSpanElement>(null);
+  const dotRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
-    if (isPaused) return;
-    const interval = setInterval(nextStep, AUTO_PLAY_INTERVAL);
-    return () => clearInterval(interval);
-  }, [nextStep, isPaused]);
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => setReducedMotion(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
 
-  const getCardStatus = (index: number) => {
-    const diff = index - currentIndex;
-    const len = PRODUCTS.length;
-    let normalizedDiff = diff;
-    if (diff > len / 2) normalizedDiff -= len;
-    if (diff < -len / 2) normalizedDiff += len;
-    if (normalizedDiff === 0) return "active";
-    if (normalizedDiff === -1) return "prev";
-    if (normalizedDiff === 1) return "next";
-    return "hidden";
-  };
+  useGSAP(
+    () => {
+      if (!wrapperRef.current || reducedMotion) return;
+
+      const scrollDist = N * window.innerHeight;
+
+      // Initial state — product 0 visible, rest hidden
+      imgRefs.current.forEach((el, i) => {
+        if (!el) return;
+        gsap.set(el, {
+          clipPath: i === 0 ? 'inset(0 0% 0 0 round 1rem)' : 'inset(0 100% 0 0 round 1rem)',
+          opacity: i === 0 ? 1 : 0,
+        });
+      });
+      contentRefs.current.forEach((el, i) => {
+        if (!el) return;
+        gsap.set(el, { opacity: i === 0 ? 1 : 0, y: i === 0 ? 0 : 40 });
+      });
+
+      const st = ScrollTrigger.create({
+        trigger: wrapperRef.current,
+        start: 'top top',
+        end: `+=${scrollDist}`,
+        pin: true,
+        scrub: 1,
+        onUpdate(self) {
+          const raw = self.progress * N;
+          const idx = Math.min(Math.floor(raw), N - 1);
+          const local = raw - idx; // 0→1 within this product's segment
+
+          setActiveIdx(idx);
+
+          if (counterRef.current) {
+            counterRef.current.textContent = String(idx + 1).padStart(2, '0');
+          }
+          if (progressRef.current) {
+            progressRef.current.style.transform = `scaleX(${self.progress})`;
+          }
+
+          // Update dot sizes
+          dotRefs.current.forEach((dot, i) => {
+            if (!dot) return;
+            dot.style.height = i === idx ? '2rem' : '0.375rem';
+            dot.style.opacity = i === idx ? '1' : '0.25';
+          });
+
+          PRODUCTS.forEach((_, i) => {
+            const img = imgRefs.current[i];
+            const content = contentRefs.current[i];
+            if (!img || !content) return;
+
+            if (i === idx) {
+              // Reveal: clip from right → 0 over first 35% of segment
+              const inT = easeInOut(remap(local, 0, 0.35));
+              // Exit: clip from left → 100% over last 25%
+              const outT = easeInOut(remap(local, 0.75, 1.0));
+
+              const right = (1 - inT) * 100;
+              const left = outT * 100;
+              gsap.set(img, {
+                clipPath: `inset(0 ${right}% 0 ${left}% round 1rem)`,
+                opacity: 1 - outT * 0.4,
+              });
+
+              // Content: slides up on enter, fades on exit
+              const contentIn = remap(local, 0, 0.4);
+              const contentOut = remap(local, 0.75, 1.0);
+              gsap.set(content, {
+                opacity: contentIn * (1 - contentOut),
+                y: (1 - contentIn) * 40 - contentOut * 20,
+              });
+            } else if (i < idx) {
+              gsap.set(img, { clipPath: 'inset(0 0% 0 100% round 1rem)', opacity: 0 });
+              gsap.set(content, { opacity: 0, y: -20 });
+            } else {
+              gsap.set(img, { clipPath: 'inset(0 100% 0 0 round 1rem)', opacity: 0 });
+              gsap.set(content, { opacity: 0, y: 40 });
+            }
+          });
+        },
+      });
+
+      const onResize = () => ScrollTrigger.refresh();
+      window.addEventListener('resize', onResize);
+
+      return () => {
+        st.kill();
+        window.removeEventListener('resize', onResize);
+      };
+    },
+    { scope: wrapperRef, dependencies: [reducedMotion] },
+  );
 
   return (
-    <div className="w-full max-w-7xl mx-auto md:p-8">
-      <div className="relative overflow-hidden rounded-[2.5rem] lg:rounded-[4rem] flex flex-col lg:flex-row min-h-[600px] lg:aspect-video border border-[#E1E0CC]/10">
+    <div
+      ref={wrapperRef}
+      className="relative w-full overflow-hidden bg-black"
+      style={{ height: '100svh' }}
+    >
+      {/* Section heading */}
+      <div className="absolute top-8 left-[4vw] z-20 pointer-events-none">
+        <span
+          className="text-xs uppercase tracking-[0.3em]"
+          style={{ color: 'rgba(225,224,204,0.35)' }}
+        >
+          Things That I Build
+        </span>
+      </div>
 
-        {/* Left sidebar — dark theme */}
-        <div className="w-full lg:w-[40%] min-h-[350px] md:min-h-[450px] lg:h-full relative z-30 flex flex-col items-start justify-center overflow-hidden px-8 md:px-16 lg:pl-16 bg-black">
-          <div className="absolute inset-x-0 top-0 h-12 md:h-20 lg:h-16 bg-gradient-to-b from-black via-black/80 to-transparent z-40" />
-          <div className="absolute inset-x-0 bottom-0 h-12 md:h-20 lg:h-16 bg-gradient-to-t from-black via-black/80 to-transparent z-40" />
+      {/* Giant background counter */}
+      <div
+        className="absolute inset-0 flex items-center justify-center z-0 pointer-events-none select-none"
+        aria-hidden
+      >
+        <span
+          ref={counterRef}
+          className="font-bold leading-none"
+          style={{
+            fontSize: 'clamp(12rem, 35vw, 28rem)',
+            color: 'rgba(225,224,204,0.03)',
+            letterSpacing: '-0.05em',
+          }}
+        >
+          01
+        </span>
+      </div>
 
-          <div className="relative w-full h-full flex items-center justify-center lg:justify-start z-20">
-            {PRODUCTS.map((product, index) => {
-              const isActive = index === currentIndex;
-              const distance = index - currentIndex;
-              const wrappedDistance = wrap(
-                -(PRODUCTS.length / 2),
-                PRODUCTS.length / 2,
-                distance
-              );
+      {/* Main layout */}
+      <div className="absolute inset-0 flex flex-col lg:flex-row items-center gap-8 lg:gap-16 px-[4vw] pt-24 pb-16">
 
-              return (
-                <motion.div
-                  key={product.id}
-                  style={{ height: ITEM_HEIGHT, width: "fit-content" }}
-                  animate={{
-                    y: wrappedDistance * ITEM_HEIGHT,
-                    opacity: 1 - Math.abs(wrappedDistance) * 0.25,
-                  }}
-                  transition={{ type: "spring", stiffness: 90, damping: 22, mass: 1 }}
-                  className="absolute flex items-center justify-start"
+        {/* Left: content stack */}
+        <div className="relative w-full lg:w-[38%] flex-shrink-0 flex items-center" style={{ height: '100%' }}>
+          {PRODUCTS.map((product, i) => (
+            <div
+              key={product.id}
+              ref={(el) => { contentRefs.current[i] = el; }}
+              className="absolute inset-0 flex flex-col justify-center gap-6 will-change-transform"
+            >
+              {/* Icon + status */}
+              <div className="flex items-center gap-3">
+                <div
+                  className="flex items-center justify-center w-10 h-10 rounded-xl"
+                  style={{ background: 'rgba(225,224,204,0.06)', border: '1px solid rgba(225,224,204,0.1)' }}
                 >
-                  <button
-                    onClick={() => handleChipClick(index)}
-                    onMouseEnter={() => setIsPaused(true)}
-                    onMouseLeave={() => setIsPaused(false)}
-                    className={cn(
-                      "relative flex items-center gap-4 px-6 md:px-10 lg:px-8 py-3.5 md:py-5 lg:py-4 rounded-full transition-all duration-700 text-left group border cursor-pointer",
-                      isActive
-                        ? "bg-[#E1E0CC] text-black border-[#E1E0CC]"
-                        : "bg-transparent text-[#E1E0CC]/50 border-[#E1E0CC]/20 hover:border-[#E1E0CC]/40 hover:text-[#E1E0CC]"
-                    )}
+                  <HugeiconsIcon icon={product.icon} size={18} strokeWidth={1.5} color="rgba(225,224,204,0.7)" />
+                </div>
+                {product.inProgress && (
+                  <span
+                    className="text-[10px] uppercase tracking-[0.3em] px-3 py-1 rounded-full"
+                    style={{ background: 'rgba(251,191,36,0.08)', color: '#fbbf24', border: '1px solid rgba(251,191,36,0.2)' }}
                   >
-                    <div className={cn(
-                      "flex items-center justify-center transition-colors duration-500",
-                      isActive ? "text-black" : "text-[#E1E0CC]/40"
-                    )}>
-                      <HugeiconsIcon icon={product.icon} size={18} strokeWidth={2} />
-                    </div>
-                    <span className="font-normal text-sm md:text-[15px] tracking-tight whitespace-nowrap uppercase">
-                      {product.label}
-                    </span>
-                  </button>
-                </motion.div>
-              );
-            })}
-          </div>
+                    In Progress
+                  </span>
+                )}
+              </div>
+
+              {/* Title */}
+              <h3
+                className="font-bold leading-[0.9] tracking-[-0.04em]"
+                style={{
+                  fontSize: 'clamp(2.5rem, 5vw, 4.5rem)',
+                  color: '#E1E0CC',
+                }}
+              >
+                {product.label}
+              </h3>
+
+              {/* Description */}
+              <p
+                className="text-base lg:text-lg leading-relaxed max-w-sm"
+                style={{ color: 'rgba(225,224,204,0.5)' }}
+              >
+                {product.description}
+              </p>
+
+              {/* Index */}
+              <span
+                className="text-xs uppercase tracking-[0.3em]"
+                style={{ color: 'rgba(225,224,204,0.2)' }}
+              >
+                {String(i + 1).padStart(2, '0')} — {String(N).padStart(2, '0')}
+              </span>
+            </div>
+          ))}
         </div>
 
-        {/* Right — image cards */}
-        <div className="flex-1 min-h-[500px] md:min-h-[600px] lg:h-full relative bg-black flex items-center justify-center py-16 md:py-24 lg:py-16 px-6 md:px-12 lg:px-10 overflow-hidden border-t lg:border-t-0 lg:border-l border-[#E1E0CC]/10">
-          <div className="relative w-full max-w-[420px] aspect-[4/5] flex items-center justify-center">
-            {PRODUCTS.map((product, index) => {
-              const status = getCardStatus(index);
-              const isActive = status === "active";
-              const isPrev = status === "prev";
-              const isNext = status === "next";
-
-              return (
-                <motion.div
-                  key={product.id}
-                  initial={false}
-                  animate={{
-                    x: isActive ? 0 : isPrev ? -100 : isNext ? 100 : 0,
-                    scale: isActive ? 1 : isPrev || isNext ? 0.85 : 0.7,
-                    opacity: isActive ? 1 : isPrev || isNext ? 0.4 : 0,
-                    rotate: isPrev ? -3 : isNext ? 3 : 0,
-                    zIndex: isActive ? 20 : isPrev || isNext ? 10 : 0,
-                    pointerEvents: isActive ? "auto" : "none",
-                  }}
-                  transition={{ type: "spring", stiffness: 260, damping: 25, mass: 0.8 }}
-                  className="absolute inset-0 rounded-[2rem] md:rounded-[2.8rem] overflow-hidden border-4 md:border-8 border-[#111] bg-[#111] origin-center"
-                >
-                  <img
-                    src={product.image}
-                    alt={product.label}
-                    className={cn(
-                      "w-full h-full object-cover transition-all duration-700",
-                      isActive ? "grayscale-0 blur-0" : "grayscale blur-[2px] brightness-75"
-                    )}
-                  />
-
-                  <AnimatePresence>
-                    {isActive && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        className="absolute inset-x-0 bottom-0 p-10 pt-32 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end pointer-events-none"
-                      >
-                        <div className="bg-[#E1E0CC] text-black px-4 py-1.5 rounded-full text-[11px] font-normal uppercase tracking-[0.2em] w-fit mb-3">
-                          {index + 1} • {product.label}
-                        </div>
-                        <p className="text-[#E1E0CC] font-normal text-xl md:text-2xl leading-tight tracking-tight drop-shadow-md">
-                          {product.description}
-                        </p>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-
-                  <div className={cn(
-                    "absolute top-8 left-8 flex items-center gap-3 transition-opacity duration-300",
-                    isActive ? "opacity-100" : "opacity-0"
-                  )}>
-                    <div className={cn(
-                      "w-2 h-2 rounded-full",
-                      product.inProgress
-                        ? "bg-amber-400 shadow-[0_0_10px_theme(colors.amber.400)]"
-                        : "bg-[#E1E0CC] shadow-[0_0_10px_#E1E0CC]"
-                    )} />
-                    <span className={cn(
-                      "text-[11px] font-semibold uppercase tracking-[0.3em] font-mono",
-                      product.inProgress ? "text-amber-400" : "text-white"
-                    )}>
-                      {product.inProgress ? "In Progress" : "Live Preview"}
-                    </span>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
+        {/* Right: image stack */}
+        <div className="relative flex-1 h-full max-h-[70vh] lg:max-h-none rounded-2xl overflow-visible">
+          {PRODUCTS.map((product, i) => (
+            <div
+              key={product.id}
+              ref={(el) => { imgRefs.current[i] = el; }}
+              className="absolute inset-0 will-change-transform"
+              style={{ borderRadius: '1rem', overflow: 'hidden' }}
+            >
+              <img
+                src={product.image}
+                alt={product.label}
+                className="w-full h-full object-cover"
+                draggable={false}
+              />
+              {/* Overlay gradient */}
+              <div
+                className="absolute inset-0"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(0,0,0,0.4) 0%, transparent 60%)',
+                }}
+              />
+            </div>
+          ))}
         </div>
+      </div>
 
+      {/* Side progress dots */}
+      <div
+        className="absolute right-6 top-1/2 -translate-y-1/2 z-20 flex flex-col items-center gap-2"
+        aria-hidden
+      >
+        {PRODUCTS.map((_, i) => (
+          <div
+            key={i}
+            ref={(el) => { dotRefs.current[i] = el; }}
+            className="w-[3px] rounded-full transition-all duration-500"
+            style={{
+              height: i === activeIdx ? '2rem' : '0.375rem',
+              opacity: i === activeIdx ? 1 : 0.25,
+              background: '#E1E0CC',
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Bottom progress bar */}
+      <div
+        className="absolute bottom-0 left-0 right-0 h-px z-20"
+        style={{ background: 'rgba(225,224,204,0.08)' }}
+      >
+        <div
+          ref={progressRef}
+          className="h-full origin-left will-change-transform"
+          style={{ background: '#E1E0CC', transform: 'scaleX(0)' }}
+        />
+      </div>
+
+      {/* Scroll hint */}
+      <div
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 pointer-events-none flex flex-col items-center gap-2"
+        style={{ opacity: activeIdx === 0 ? 1 : 0, transition: 'opacity 0.5s' }}
+      >
+        <span
+          className="text-[10px] uppercase tracking-[0.3em]"
+          style={{ color: 'rgba(225,224,204,0.2)' }}
+        >
+          scroll
+        </span>
       </div>
     </div>
   );

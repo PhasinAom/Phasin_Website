@@ -279,9 +279,10 @@ export const LampContainer = ({
         {/* Left cone */}
         <motion.div
           initial={{ opacity: 0.5, width: "8rem" }}
-          whileInView={{ opacity: 1, width: "clamp(10rem, 40vw, 30rem)" }}
+          whileInView={{ opacity: 1, width: "30rem" }}
+          viewport={{ once: true }}
           transition={{ delay: 0.3, duration: 0.8, ease: "easeInOut" }}
-          className="absolute inset-auto right-1/2 h-56 overflow-visible"
+          className="absolute inset-auto right-1/2 h-56 overflow-visible max-w-[40vw]"
           style={{ backgroundImage: `conic-gradient(from 70deg at center top, ${color}, transparent, transparent)`, transition: "background-image 0.6s ease" }}
         >
           <div className="absolute w-[100%] left-0 bg-black h-40 bottom-0 z-20 [mask-image:linear-gradient(to_top,white,transparent)]" />
@@ -291,9 +292,10 @@ export const LampContainer = ({
         {/* Right cone */}
         <motion.div
           initial={{ opacity: 0.5, width: "8rem" }}
-          whileInView={{ opacity: 1, width: "clamp(10rem, 40vw, 30rem)" }}
+          whileInView={{ opacity: 1, width: "30rem" }}
+          viewport={{ once: true }}
           transition={{ delay: 0.3, duration: 0.8, ease: "easeInOut" }}
-          className="absolute inset-auto left-1/2 h-56"
+          className="absolute inset-auto left-1/2 h-56 max-w-[40vw]"
           style={{ backgroundImage: `conic-gradient(from 290deg at center top, transparent, transparent, ${color})`, transition: "background-image 0.6s ease" }}
         >
           <div className="absolute w-40 h-[100%] right-0 bg-black bottom-0 z-20 [mask-image:linear-gradient(to_left,white,transparent)]" />
@@ -310,7 +312,8 @@ export const LampContainer = ({
         />
         <motion.div
           initial={{ width: "2rem" }}
-          whileInView={{ width: "clamp(3rem,8vw,6rem)" }}
+          whileInView={{ width: "6rem" }}
+          viewport={{ once: true }}
           transition={{ delay: 0.3, duration: 0.8, ease: "easeInOut" }}
           className="absolute inset-auto z-30 -translate-y-[6rem] rounded-full blur-2xl transition-colors duration-500"
           style={{ background: color, height: "3rem" }}
@@ -319,9 +322,10 @@ export const LampContainer = ({
         {/* Horizontal line */}
         <motion.div
           initial={{ width: "8rem" }}
-          whileInView={{ width: "clamp(10rem, 40vw, 30rem)" }}
+          whileInView={{ width: "30rem" }}
+          viewport={{ once: true }}
           transition={{ delay: 0.3, duration: 0.8, ease: "easeInOut" }}
-          className="absolute inset-auto z-50 h-0.5 -translate-y-[7rem] transition-colors duration-500"
+          className="absolute inset-auto z-50 h-0.5 -translate-y-[7rem] transition-colors duration-500 max-w-[40vw]"
           style={{ background: color }}
         />
         <div className="absolute inset-auto z-40 h-44 w-full -translate-y-[12.5rem] bg-black" />

@@ -206,15 +206,15 @@ export function FeatureCarousel() {
       </div>
 
       {/* Main layout */}
-      <div className="absolute inset-0 flex flex-col lg:flex-row items-center gap-8 lg:gap-16 px-[4vw] pt-24 pb-16">
+      <div className="absolute inset-0 flex flex-col lg:flex-row items-center gap-4 lg:gap-16 px-[4vw] pt-24 pb-16">
 
         {/* Left: content stack */}
-        <div className="relative w-full lg:w-[38%] flex-shrink-0 flex items-center" style={{ height: '100%' }}>
+        <div className="relative w-full lg:w-[38%] flex-shrink-0 flex items-center h-[48%] lg:h-full">
           {PRODUCTS.map((product, i) => (
             <div
               key={product.id}
               ref={(el) => { contentRefs.current[i] = el; }}
-              className="absolute inset-0 flex flex-col justify-center gap-6 will-change-transform"
+              className="absolute inset-0 flex flex-col justify-center gap-4 lg:gap-6 will-change-transform"
             >
               {/* Icon + status */}
               <div className="flex items-center gap-3">
@@ -238,7 +238,7 @@ export function FeatureCarousel() {
               <h3
                 className="font-bold leading-[0.9] tracking-[-0.04em]"
                 style={{
-                  fontSize: 'clamp(2.5rem, 5vw, 4.5rem)',
+                  fontSize: 'clamp(2rem, 5vw, 4.5rem)',
                   color: '#E1E0CC',
                 }}
               >
@@ -247,7 +247,7 @@ export function FeatureCarousel() {
 
               {/* Description */}
               <p
-                className="text-base lg:text-lg leading-relaxed max-w-sm"
+                className="text-sm lg:text-lg leading-relaxed max-w-full lg:max-w-sm"
                 style={{ color: 'rgba(225,224,204,0.5)' }}
               >
                 {product.description}
@@ -265,7 +265,7 @@ export function FeatureCarousel() {
         </div>
 
         {/* Right: image stack */}
-        <div className="relative flex-1 h-full max-h-[70vh] lg:max-h-none rounded-2xl overflow-visible">
+        <div className="relative flex-1 min-h-0 w-full h-[48%] lg:h-full rounded-2xl overflow-visible">
           {PRODUCTS.map((product, i) => (
             <div
               key={product.id}

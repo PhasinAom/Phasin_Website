@@ -186,7 +186,7 @@ export function ProjectCarousel() {
 
       {/* ── Giant ghost number ───────────────────────────────────────────── */}
       <div
-        className="absolute inset-0 flex items-center justify-start pl-[3vw] pointer-events-none select-none z-0"
+        className="absolute inset-0 flex items-center justify-start pl-[3vw] pointer-events-none select-none z-20"
         aria-hidden
       >
         <span
@@ -202,20 +202,20 @@ export function ProjectCarousel() {
       </div>
 
       {/* ── Main split layout ────────────────────────────────────────────── */}
-      <div className="absolute inset-0 flex flex-col lg:flex-row gap-6 lg:gap-12 px-[4vw] pt-20 pb-14">
+      <div className="absolute inset-0 flex flex-col lg:flex-row gap-4 lg:gap-12 px-[4vw] pt-20 pb-14">
 
         {/* Left — editorial text */}
-        <div className="relative w-full lg:w-[42%] flex-shrink-0 flex items-center z-10">
+        <div className="relative w-full lg:w-[42%] flex-shrink-0 flex items-center z-10 h-[48%] lg:h-full">
           {projects.map((p, i) => (
             <div
               key={p.id}
               ref={el => { titleRefs.current[i] = el; }}
-              className="absolute inset-0 flex flex-col justify-center gap-6 will-change-transform"
+              className="absolute inset-0 flex flex-col justify-center gap-4 lg:gap-6 will-change-transform"
             >
               {/* Huge editorial title */}
               <h3
                 className="font-bold leading-[0.85] tracking-[-0.05em]"
-                style={{ fontSize: 'clamp(3rem, 7.5vw, 6.5rem)', color: p.accent }}
+                style={{ fontSize: 'clamp(2.2rem, 7.5vw, 6.5rem)', color: p.accent }}
               >
                 {p.title.split(' ').map((w, wi) => (
                   <span key={wi} className="block">{w}</span>
@@ -225,9 +225,9 @@ export function ProjectCarousel() {
               {/* Meta — fades slightly after title */}
               <div
                 ref={el => { metaRefs.current[i] = el; }}
-                className="flex flex-col gap-4 will-change-transform"
+                className="flex flex-col gap-3 lg:gap-4 will-change-transform"
               >
-                <p className="text-base lg:text-lg leading-relaxed max-w-xs" style={{ color: `${p.accent}55` }}>
+                <p className="text-sm lg:text-lg leading-relaxed max-w-xs" style={{ color: `${p.accent}55` }}>
                   {p.description}
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -244,16 +244,7 @@ export function ProjectCarousel() {
                       {r}
                     </span>
                   ))}
-                  <span
-                    className="text-[10px] uppercase tracking-[0.25em] px-3 py-1.5 rounded-full"
-                    style={{
-                      background: `${p.accent}07`,
-                      border: `1px solid ${p.accent}1a`,
-                      color: `${p.accent}45`,
-                    }}
-                  >
-                    {p.year}
-                  </span>
+
                 </div>
               </div>
             </div>
@@ -261,7 +252,7 @@ export function ProjectCarousel() {
         </div>
 
         {/* Right — image curtain stack */}
-        <div className="relative flex-1 min-h-[40vh] lg:min-h-0 z-10">
+        <div className="relative flex-1 min-h-0 z-10">
           {projects.map((p, i) => (
             <div
               key={p.id}

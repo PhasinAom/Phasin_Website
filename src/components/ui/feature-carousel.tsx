@@ -13,6 +13,7 @@ import {
 import { HugeiconsIcon } from '@hugeicons/react';
 
 gsap.registerPlugin(ScrollTrigger);
+ScrollTrigger.normalizeScroll(true);
 
 const PRODUCTS = [
   {
@@ -83,7 +84,8 @@ export function FeatureCarousel() {
       if (!wrapperRef.current || reducedMotion) return;
 
       const scrollDist = N * window.innerHeight;
-      const scrub = window.innerWidth < 1024 ? 0.3 : 1;
+      const isMobile = window.innerWidth < 1024;
+      const scrub = isMobile ? true : 1;
 
       // Initial state — all hidden; onUpdate reveals as user scrolls in
       imgRefs.current.forEach((el) => {
@@ -100,6 +102,7 @@ export function FeatureCarousel() {
         start: 'top top',
         end: `+=${scrollDist}`,
         pin: true,
+        anticipatePin: 1,
         scrub,
         onUpdate(self) {
           const raw = self.progress * N;

@@ -82,8 +82,6 @@ export function FeatureCarousel() {
     () => {
       if (!wrapperRef.current || reducedMotion) return;
 
-      ScrollTrigger.normalizeScroll(true);
-
       const scrollDist = N * window.innerHeight;
       const isMobile = window.innerWidth < 1024;
       const scrub = isMobile ? true : 1;

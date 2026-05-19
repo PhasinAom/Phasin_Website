@@ -42,8 +42,6 @@ export function ProjectCarousel() {
     () => {
       if (!sectionRef.current || reducedMotion) return;
 
-      ScrollTrigger.normalizeScroll(true);
-
       const scrollDist = (N - 1) * window.innerHeight;
       const isMobile = window.innerWidth < 1024;
       const scrub = isMobile ? true : 1.2;

@@ -234,6 +234,13 @@ body {
   background-size: 128px 128px;
 }
 
+/* Disable expensive blend mode on mobile — major scroll perf win */
+@media (max-width: 1023px) {
+  .noise-overlay {
+    display: none;
+  }
+}
+
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);

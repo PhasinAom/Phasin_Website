@@ -260,7 +260,8 @@ export const Hero = () => {
 
   useEffect(() => {
     const alreadySeen = sessionStorage.getItem(INTRO_KEY);
-    if (alreadySeen) { setHeroReady(true); } else { setShowIntro(true); }
+    const isMobile = window.innerWidth < 1024;
+    if (alreadySeen || isMobile) { setHeroReady(true); } else { setShowIntro(true); }
   }, []);
 
   useEffect(() => {

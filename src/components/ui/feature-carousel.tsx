@@ -83,6 +83,7 @@ export function FeatureCarousel() {
       if (!wrapperRef.current || reducedMotion) return;
 
       const scrollDist = N * window.innerHeight;
+      const scrub = window.innerWidth < 1024 ? 0.3 : 1;
 
       // Initial state — all hidden; onUpdate reveals as user scrolls in
       imgRefs.current.forEach((el) => {
@@ -99,7 +100,7 @@ export function FeatureCarousel() {
         start: 'top top',
         end: `+=${scrollDist}`,
         pin: true,
-        scrub: 1,
+        scrub,
         onUpdate(self) {
           const raw = self.progress * N;
           const idx = Math.min(Math.floor(raw), N - 1);

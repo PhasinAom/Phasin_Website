@@ -43,6 +43,7 @@ export function ProjectCarousel() {
       if (!sectionRef.current || reducedMotion) return;
 
       const scrollDist = (N - 1) * window.innerHeight;
+      const scrub = window.innerWidth < 1024 ? 0.3 : 1.2;
 
       // ── Initial state ────────────────────────────────────────────────────────
       imgRefs.current.forEach((el, i) => {
@@ -72,7 +73,7 @@ export function ProjectCarousel() {
         start: 'top top',
         end: `+=${scrollDist}`,
         pin: true,
-        scrub: 1.2,
+        scrub,
         onUpdate(self) {
           const raw      = self.progress * (N - 1);
           const tIdx     = Math.min(Math.floor(raw), N - 2); // which transition (0 or 1)

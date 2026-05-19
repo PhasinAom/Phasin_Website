@@ -3,6 +3,11 @@
 html, body {
   overflow-x: hidden;
   max-width: 100%;
+  background: #000;
+}
+
+.gsap-pin-spacer {
+  background: #000 !important;
 }
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";

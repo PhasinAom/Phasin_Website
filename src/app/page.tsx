@@ -10,7 +10,7 @@ import { FooterSection } from "@/components/footer-section";
 
 export default function Home() {
   return (
-    <main className="overflow-x-hidden">
+    <main className="overflow-x-hidden bg-black">
       <div className="p-2 sm:p-3 md:p-4 bg-black">
         <Hero />
       </div>

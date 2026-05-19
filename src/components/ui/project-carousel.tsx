@@ -7,7 +7,6 @@ import { useGSAP } from '@gsap/react';
 import { projects } from '@/lib/projects';
 
 gsap.registerPlugin(ScrollTrigger);
-ScrollTrigger.normalizeScroll(true);
 
 const N = projects.length;
 
@@ -42,6 +41,8 @@ export function ProjectCarousel() {
   useGSAP(
     () => {
       if (!sectionRef.current || reducedMotion) return;
+
+      ScrollTrigger.normalizeScroll(true);
 
       const scrollDist = (N - 1) * window.innerHeight;
       const isMobile = window.innerWidth < 1024;

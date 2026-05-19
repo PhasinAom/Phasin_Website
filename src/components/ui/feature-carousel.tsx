@@ -84,17 +84,14 @@ export function FeatureCarousel() {
 
       const scrollDist = N * window.innerHeight;
 
-      // Initial state — product 0 visible, rest hidden
-      imgRefs.current.forEach((el, i) => {
+      // Initial state — all hidden; onUpdate reveals as user scrolls in
+      imgRefs.current.forEach((el) => {
         if (!el) return;
-        gsap.set(el, {
-          clipPath: i === 0 ? 'inset(0 0% 0 0 round 1rem)' : 'inset(0 100% 0 0 round 1rem)',
-          opacity: i === 0 ? 1 : 0,
-        });
+        gsap.set(el, { clipPath: 'inset(0 100% 0 0 round 1rem)', opacity: 0 });
       });
-      contentRefs.current.forEach((el, i) => {
+      contentRefs.current.forEach((el) => {
         if (!el) return;
-        gsap.set(el, { opacity: i === 0 ? 1 : 0, y: i === 0 ? 0 : 40 });
+        gsap.set(el, { opacity: 0, y: 40 });
       });
 
       const st = ScrollTrigger.create({
@@ -215,6 +212,7 @@ export function FeatureCarousel() {
               key={product.id}
               ref={(el) => { contentRefs.current[i] = el; }}
               className="absolute inset-0 flex flex-col justify-center gap-4 lg:gap-6 will-change-transform"
+              style={{ opacity: 0 }}
             >
               {/* Icon + status */}
               <div className="flex items-center gap-3">
@@ -271,7 +269,7 @@ export function FeatureCarousel() {
               key={product.id}
               ref={(el) => { imgRefs.current[i] = el; }}
               className="absolute inset-0 will-change-transform"
-              style={{ borderRadius: '1rem', overflow: 'hidden' }}
+              style={{ borderRadius: '1rem', overflow: 'hidden', opacity: 0 }}
             >
               <img
                 src={product.image}

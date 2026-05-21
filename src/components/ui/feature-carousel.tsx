@@ -63,6 +63,7 @@ export function FeatureCarousel() {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [activeIdx, setActiveIdx] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   const imgRefs = useRef<(HTMLDivElement | null)[]>([]);
   const contentRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -78,13 +79,19 @@ export function FeatureCarousel() {
     return () => mq.removeEventListener('change', update);
   }, []);
 
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 1024);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
   useGSAP(
     () => {
-      if (!wrapperRef.current || reducedMotion) return;
+      if (!wrapperRef.current || reducedMotion || isMobile) return;
 
       const scrollDist = N * window.innerHeight;
-      const isMobile = window.innerWidth < 1024;
-      const scrub = isMobile ? true : 1;
+      const scrub = 1;
 
       // Initial state — all hidden; onUpdate reveals as user scrolls in
       imgRefs.current.forEach((el) => {
@@ -168,8 +175,47 @@ export function FeatureCarousel() {
         window.removeEventListener('resize', onResize);
       };
     },
-    { scope: wrapperRef, dependencies: [reducedMotion] },
+    { scope: wrapperRef, dependencies: [reducedMotion, isMobile] },
   );
+
+  if (isMobile) {
+    return (
+      <div className="bg-black px-5 py-16">
+        <span className="text-xs uppercase tracking-[0.3em] mb-10 block" style={{ color: 'rgba(225,224,204,0.35)' }}>
+          Things That I Build
+        </span>
+        <div className="flex flex-col gap-10">
+          {PRODUCTS.map((product) => (
+            <div key={product.id} className="flex flex-col gap-4">
+              <div className="relative w-full aspect-video rounded-2xl overflow-hidden">
+                <img src={product.image} alt={product.label} className="w-full h-full object-cover" draggable={false} />
+                <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, rgba(0,0,0,0.4) 0%, transparent 60%)' }} />
+              </div>
+              <div className="flex items-center gap-3">
+                <div
+                  className="flex items-center justify-center w-9 h-9 rounded-xl flex-shrink-0"
+                  style={{ background: 'rgba(225,224,204,0.06)', border: '1px solid rgba(225,224,204,0.1)' }}
+                >
+                  <HugeiconsIcon icon={product.icon} size={16} strokeWidth={1.5} color="rgba(225,224,204,0.7)" />
+                </div>
+                {product.inProgress && (
+                  <span className="text-[10px] uppercase tracking-[0.3em] px-3 py-1 rounded-full" style={{ background: 'rgba(251,191,36,0.08)', color: '#fbbf24', border: '1px solid rgba(251,191,36,0.2)' }}>
+                    In Progress
+                  </span>
+                )}
+              </div>
+              <h3 className="text-2xl font-bold tracking-tight leading-tight" style={{ color: '#E1E0CC' }}>
+                {product.label}
+              </h3>
+              <p className="text-sm leading-relaxed" style={{ color: 'rgba(225,224,204,0.5)' }}>
+                {product.description}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div

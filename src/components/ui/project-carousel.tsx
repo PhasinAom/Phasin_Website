@@ -21,6 +21,7 @@ export function ProjectCarousel() {
   const sectionRef = useRef<HTMLElement>(null);
   const [activeIdx, setActiveIdx] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   const imgRefs   = useRef<(HTMLDivElement | null)[]>([]);
   const titleRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -38,13 +39,19 @@ export function ProjectCarousel() {
     return () => mq.removeEventListener('change', up);
   }, []);
 
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 1024);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
   useGSAP(
     () => {
-      if (!sectionRef.current || reducedMotion) return;
+      if (!sectionRef.current || reducedMotion || isMobile) return;
 
       const scrollDist = (N - 1) * window.innerHeight;
-      const isMobile = window.innerWidth < 1024;
-      const scrub = isMobile ? true : 1.2;
+      const scrub = 1.2;
 
       // ── Initial state ────────────────────────────────────────────────────────
       imgRefs.current.forEach((el, i) => {
@@ -150,8 +157,47 @@ export function ProjectCarousel() {
         window.removeEventListener('resize', onResize);
       };
     },
-    { scope: sectionRef, dependencies: [reducedMotion] },
+    { scope: sectionRef, dependencies: [reducedMotion, isMobile] },
   );
+
+  if (isMobile) {
+    return (
+      <section aria-label="Selected Work" className="bg-black px-5 py-16">
+        <span className="text-xs uppercase tracking-[0.3em] mb-10 block" style={{ color: 'rgba(225,224,204,0.35)' }}>
+          Selected Work
+        </span>
+        <div className="flex flex-col gap-12">
+          {projects.map((p) => (
+            <div key={p.id} className="flex flex-col gap-4">
+              {p.image && (
+                <div className="relative w-full aspect-video rounded-2xl overflow-hidden">
+                  <img src={p.image} alt={p.title} className="w-full h-full object-cover" draggable={false} />
+                  <div className="absolute inset-0" style={{ background: `linear-gradient(160deg, ${p.bg}55 0%, transparent 55%)` }} />
+                </div>
+              )}
+              <h3 className="text-2xl font-bold leading-tight tracking-tight" style={{ color: p.accent }}>
+                {p.title}
+              </h3>
+              <p className="text-sm leading-relaxed" style={{ color: `${p.accent}88` }}>
+                {p.description}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {p.role.map((r) => (
+                  <span
+                    key={r}
+                    className="text-[10px] uppercase tracking-[0.25em] px-3 py-1.5 rounded-full"
+                    style={{ background: `${p.accent}07`, border: `1px solid ${p.accent}1a`, color: `${p.accent}77` }}
+                  >
+                    {r}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section

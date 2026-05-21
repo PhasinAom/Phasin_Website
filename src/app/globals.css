@@ -1,9 +1,19 @@
 @import "tailwindcss";
 
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
 html, body {
   overflow-x: hidden;
   max-width: 100%;
   background: #000;
+}
+
+body {
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
 }
 
 .gsap-pin-spacer {
@@ -234,10 +244,20 @@ body {
   background-size: 128px 128px;
 }
 
-/* Disable expensive blend mode on mobile — major scroll perf win */
+/* Disable expensive effects on mobile — major scroll perf win */
 @media (max-width: 1023px) {
   .noise-overlay {
     display: none;
+  }
+  .parallax__title {
+    mix-blend-mode: normal;
+    opacity: 0.9;
+  }
+  .parallax__visuals {
+    will-change: transform;
+  }
+  .parallax__layer-img {
+    will-change: transform;
   }
 }
 

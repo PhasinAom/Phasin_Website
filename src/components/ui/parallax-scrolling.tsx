@@ -11,6 +11,8 @@ export function ParallaxSection() {
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
 
+    const isTouch = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+
     const triggerElement = parallaxRef.current?.querySelector('[data-parallax-layers]');
 
     if (triggerElement) {
@@ -19,7 +21,7 @@ export function ParallaxSection() {
           trigger: triggerElement,
           start: "0% 0%",
           end: "100% 0%",
-          scrub: 0,
+          scrub: isTouch ? 0.5 : 0,
         },
       });
 
@@ -39,15 +41,21 @@ export function ParallaxSection() {
       });
     }
 
-    const lenis = new Lenis();
-    lenis.on('scroll', ScrollTrigger.update);
-    gsap.ticker.add((time) => { lenis.raf(time * 1000); });
-    gsap.ticker.lagSmoothing(0);
+    let lenis: InstanceType<typeof Lenis> | null = null;
+
+    if (!isTouch) {
+      lenis = new Lenis();
+      lenis.on('scroll', ScrollTrigger.update);
+      gsap.ticker.add((time) => { lenis!.raf(time * 1000); });
+      gsap.ticker.lagSmoothing(0);
+    } else {
+      ScrollTrigger.normalizeScroll(true);
+    }
 
     return () => {
       ScrollTrigger.getAll().forEach((st) => st.kill());
       if (triggerElement) gsap.killTweensOf(triggerElement);
-      lenis.destroy();
+      lenis?.destroy();
     };
   }, []);
 

@@ -5,6 +5,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import { projects } from '@/lib/projects';
+import { MobileCarousel } from './mobile-carousel';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -145,16 +146,12 @@ export function ProjectCarousel() {
 
   return (
     <>
-      {/* ── Mobile layout (< lg) — plain stacked cards, no GSAP ── */}
-      <section aria-label="Selected Work" className="lg:hidden bg-black px-5 py-16">
-        <span
-          className="text-xs uppercase tracking-[0.3em] mb-10 block"
-          style={{ color: 'rgba(225,224,204,0.35)' }}
-        >
-          Selected Work
-        </span>
-        <div className="flex flex-col gap-12">
-          {projects.map((p) => (
+      {/* ── Mobile layout (< lg) — animated swipe carousel ── */}
+      <section aria-label="Selected Work" className="lg:hidden">
+        <MobileCarousel
+          label="Selected Work"
+          reducedMotion={reducedMotion}
+          items={projects.map((p) => (
             <div key={p.id} className="flex flex-col gap-4">
               {p.image && (
                 <div className="relative w-full aspect-video rounded-2xl overflow-hidden">
@@ -196,7 +193,7 @@ export function ProjectCarousel() {
               </div>
             </div>
           ))}
-        </div>
+        />
       </section>
 
       {/* ── Desktop layout (≥ lg) — GSAP pinned carousel ── */}

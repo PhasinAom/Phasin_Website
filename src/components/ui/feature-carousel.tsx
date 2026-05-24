@@ -4,6 +4,7 @@ import { useRef, useState, useEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
+import { MobileCarousel } from './mobile-carousel';
 import {
   GlobalSearchIcon,
   AiCloudIcon,
@@ -165,16 +166,12 @@ export function FeatureCarousel() {
 
   return (
     <>
-      {/* ── Mobile layout (< lg) — plain stacked cards, no GSAP ── */}
-      <div className="lg:hidden bg-black px-5 py-16">
-        <span
-          className="text-xs uppercase tracking-[0.3em] mb-10 block"
-          style={{ color: 'rgba(225,224,204,0.35)' }}
-        >
-          Things That I Build
-        </span>
-        <div className="flex flex-col gap-10">
-          {PRODUCTS.map((product) => (
+      {/* ── Mobile layout (< lg) — animated swipe carousel ── */}
+      <div className="lg:hidden">
+        <MobileCarousel
+          label="Things That I Build"
+          reducedMotion={reducedMotion}
+          items={PRODUCTS.map((product) => (
             <div key={product.id} className="flex flex-col gap-4">
               <div className="relative w-full aspect-video rounded-2xl overflow-hidden">
                 <img
@@ -215,7 +212,7 @@ export function FeatureCarousel() {
               </p>
             </div>
           ))}
-        </div>
+        />
       </div>
 
       {/* ── Desktop layout (≥ lg) — GSAP pinned carousel ── */}
